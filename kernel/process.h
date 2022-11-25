@@ -26,5 +26,6 @@ typedef struct process_t {
 void switch_to(process*);
 
 extern process* current;
+void print_backtrace(int);
 
 #endif

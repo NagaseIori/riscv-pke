@@ -54,7 +54,3 @@ void switch_to(process* proc) {
   // return_to_user() is defined in kernel/strap_vector.S. switch to user mode with sret.
   return_to_user(proc->trapframe);
 }
-
-void print_backtrace(int floors) {
-
-}

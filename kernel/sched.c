@@ -6,7 +6,7 @@
 #include "spike_interface/spike_utils.h"
 
 process* ready_queue_head = NULL;
-process *blocked_queue_head = NULL;
+process* blocked_queue_head = NULL;
 
 //
 // insert a process, proc, into the END of ready queue.

@@ -40,12 +40,11 @@ ssize_t sys_user_exit(uint64 code) {
     schedule();
     return 0;
   }
-  // find the blocked parent
   process *pre = NULL;
   process *cur = blocked_queue_head;
   while (cur)
   {
-    if (cur == current->parent && cur->waiting == current)
+    if (cur->waiting == current)
     {
       if(pre) pre->queue_next = cur->queue_next;
       insert_to_ready_queue(cur);

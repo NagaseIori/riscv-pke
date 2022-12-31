@@ -66,6 +66,8 @@ typedef struct process_t {
   int status;
   // parent process
   struct process_t *parent;
+  // waiting process
+  struct process_t *waiting;
   // next queue element
   struct process_t *queue_next;
 

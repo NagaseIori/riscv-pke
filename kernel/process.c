@@ -143,6 +143,7 @@ process* alloc_process() {
     procs[i].trapframe, procs[i].trapframe->regs.sp, procs[i].kstack);
 
   procs[i].total_mapped_region = 3;
+  procs[i].waiting = NULL;
   // return after initialization.
   return &procs[i];
 }

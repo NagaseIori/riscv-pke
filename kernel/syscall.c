@@ -43,7 +43,7 @@ ssize_t sys_user_exit(uint64 code) {
   // find the blocked parent
   process *pre = blocked_queue_head;
   process *cur = pre->queue_next;
-  if (current->parent == pre)
+  if (current->parent == pre && pre->waiting == current)
   {
     blocked_queue_head = blocked_queue_head->queue_next;
     insert_to_ready_queue(pre);
@@ -52,7 +52,7 @@ ssize_t sys_user_exit(uint64 code) {
   }
   while (cur)
   {
-    if (cur == current->parent)
+    if (cur == current->parent && cur->waiting == current)
     {
       pre->queue_next = cur->queue_next;
       insert_to_ready_queue(cur);
@@ -112,8 +112,6 @@ ssize_t sys_user_yield() {
 ssize_t sys_user_wait(int pid)
 {
   process *child = NULL;
-  if (pid < -1)
-    return -1;
 
   if (pid == -1)
   {
@@ -132,6 +130,7 @@ ssize_t sys_user_wait(int pid)
     if (child)
     {
       current->status = BLOCKED;
+      current->waiting = child;
       insert_to_blocked_queue(current);
       schedule();
       return child->pid;
@@ -148,6 +147,7 @@ ssize_t sys_user_wait(int pid)
       {
         isfind = 1;
         child = &procs[i];
+        break;
       }
     }
     if (!isfind)
@@ -156,6 +156,7 @@ ssize_t sys_user_wait(int pid)
       return pid;
 
     current->status = BLOCKED;
+    current->waiting = child;
     insert_to_blocked_queue(current);
     schedule();
     return pid;

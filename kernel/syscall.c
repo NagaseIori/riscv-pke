@@ -41,20 +41,13 @@ ssize_t sys_user_exit(uint64 code) {
     return 0;
   }
   // find the blocked parent
-  process *pre = blocked_queue_head;
-  process *cur = pre->queue_next;
-  if (current->parent == pre && pre->waiting == current)
-  {
-    blocked_queue_head = blocked_queue_head->queue_next;
-    insert_to_ready_queue(pre);
-    schedule();
-    return 0;
-  }
+  process *pre = NULL;
+  process *cur = blocked_queue_head;
   while (cur)
   {
     if (cur == current->parent && cur->waiting == current)
     {
-      pre->queue_next = cur->queue_next;
+      if(pre) pre->queue_next = cur->queue_next;
       insert_to_ready_queue(cur);
       schedule();
       return 0;
@@ -113,19 +106,15 @@ ssize_t sys_user_wait(int pid)
 {
   process *child = NULL;
 
-  if (pid == -1)
+  if (pid >= -1)
   {
-    // find if all the child do exit
-    // if yes, keep going, else blocked
     int temp_pid = 0;
     for (int i = 0; i < NPROC; i++)
-    {
-      if (procs[i].parent == current)
-        temp_pid = procs[i].pid;
-      if (procs[i].parent == current && procs[i].status != ZOMBIE)
-      {
+    if(procs[i].parent == current && (pid == -1 || pid == procs[i].pid)) {
+      temp_pid = procs[i].pid;
+      if (procs[i].status != ZOMBIE)
         child = &procs[i];
-      }
+      if(pid >= 0) break;
     }
     if (child)
     {
@@ -135,31 +124,8 @@ ssize_t sys_user_wait(int pid)
       schedule();
       return child->pid;
     }
-    return temp_pid;
-  }
-
-  if (pid > 0)
-  {
-    int isfind = 0;
-    for (int i = 0; i < NPROC; i++)
-    {
-      if (procs[i].parent == current && procs[i].pid == pid)
-      {
-        isfind = 1;
-        child = &procs[i];
-        break;
-      }
-    }
-    if (!isfind)
-      return -1;
-    if (child->status == ZOMBIE)
-      return pid;
-
-    current->status = BLOCKED;
-    current->waiting = child;
-    insert_to_blocked_queue(current);
-    schedule();
-    return pid;
+    if(pid == -1)
+      return temp_pid;
   }
 
   return -1;

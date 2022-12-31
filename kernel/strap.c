@@ -53,9 +53,8 @@ void handle_user_page_fault(uint64 mcause, uint64 sepc, uint64 stval) {
       if(stval < USER_STACK_TOP && stval > (USER_STACK_TOP - 20 * STACK_SIZE)) {
         void* pa = alloc_page();
         user_vm_map(current->pagetable, stval / (PGSIZE) * (PGSIZE), PGSIZE, (uint64)(pa), prot_to_type(PROT_WRITE | PROT_READ, 1));
-        current->alloc_pages ++;
       }
-      if (stval < USER_STACK_TOP - PGSIZE * current->alloc_pages) {
+      else {
         panic("this address is not available!");
       }
       break;

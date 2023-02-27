@@ -29,6 +29,10 @@ extern char trap_sec_start[];
 // process pool. added @lab3_1
 process procs[NPROC];
 
+// semaphores pool
+semaphore sems[NSEM];
+int sems_top = 0;
+
 // current points to the currently running user-mode application.
 process* current = NULL;
 
@@ -212,4 +216,29 @@ int do_fork( process* parent)
   insert_to_ready_queue( child );
 
   return child->pid;
+}
+
+int sem_request(int init)
+{
+  int id = (sems_top++);
+  sems_top %= NSEM;
+
+  sems[id].value = init;
+  return id;
+}
+
+void sem_modify(int id, int val) {
+  sems[id].value += val;
+  // If V
+  if(val > 0 && sems[id].value <= 0) {
+    process *proc = sems[id].waiting_queue[-sems[id].value];
+    proc->status = READY;
+    insert_to_ready_queue(proc);
+  }
+  // If P
+  else if(val < 0 && sems[id].value < 0) {
+    current->status = BLOCKED;
+    sems[id].waiting_queue[-sems[id].value-1] = current;
+    schedule();
+  }
 }

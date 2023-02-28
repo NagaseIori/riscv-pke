@@ -42,87 +42,56 @@ ssize_t sys_user_print_backtrace(uint64 floors)
     return 0;
   
   // print backtrace
-  uint64 r_address = current->trapframe->regs.ra;
+  uint64 ra = current->trapframe->regs.ra;
   uint64 *fp = (uint64 *)(current->trapframe->regs.s0);
-  fp = (uint64 *)(*(fp - 1));
   elf_header ehdr = cur_elf_ctx.ehdr;
 
-  // sprint("here\n");
-  // find symtab & strtab
   Elf64_Shdr elf_symtab, elf_strtab;
   uint16 shnum = ehdr.shnum;
   uint64 shoff = ehdr.shoff;
   uint16 shentsize = ehdr.shentsize;
   uint16 shstrndx = ehdr.shstrndx;
 
-  // sprint("here\n");
   for (uint16 i = 0; i < shnum; i++)
   {
     Elf64_Shdr cur;
-    // the shoff is the offset to the beginning of the elf file which is not is the memory right now
     elf_fpread(&cur_elf_ctx, &cur, sizeof(cur), shoff + i * shentsize);
-    // sprint("here\n");
     if (cur.sh_type == SHT_SYMTAB)
-    {
-      // sprint("here\n");
       elf_symtab = cur;
-    }
-    // shstrndx is not what we want
-    if (cur.sh_type == SHT_STRTAB && i != shstrndx)
-    {
+    else if (cur.sh_type == SHT_STRTAB && i != shstrndx)
       elf_strtab = cur;
-    }
   }
-  // sprint("here\n");
-  char str_ctl[elf_strtab.sh_size];
-  elf_fpread(&cur_elf_ctx, str_ctl, elf_strtab.sh_size, elf_strtab.sh_offset); // the strtab is arranged as char
-  // for(int i=0;i<elf_strtab.sh_size;i++) sprint("%c", str_ctl[i]);
+  char strtb[elf_strtab.sh_size];
+  elf_fpread(&cur_elf_ctx, strtb, elf_strtab.sh_size, elf_strtab.sh_offset);
 
-  // prepare the backtrace variable
   uint64 stnum = elf_symtab.sh_size / elf_symtab.sh_entsize;
   uint64 stbase = elf_symtab.sh_offset;
   uint64 stentsize = elf_symtab.sh_entsize;
-  // sprint("here\n");
 
   // backtrace
   uint64 cur_layer = 0;
   char *fname = NULL;
+  fp = (uint64 *)(*(fp - 1));
   while (cur_layer < floors)
   {
-    // sprint("%lld\n", fp);
-    r_address = (*(fp - 1));
-    // sprint("%x\n", r_address);
-    // find the function address according to the return address
+    ra = (*(fp - 1));
 
     for (uint64 i = 0; i < stnum; i++)
     {
       Elf64_Sym cur;
       elf_fpread(&cur_elf_ctx, &cur, sizeof(cur), stbase + i * stentsize);
-      if ((cur.st_info & 0xf) == STT_FUNC && r_address >= cur.st_value && r_address < cur.st_value + cur.st_size)
+      if ((cur.st_info & 0xf) == STT_FUNC && ra >= cur.st_value && ra < cur.st_value + cur.st_size)
       {
-        // decode the symbol in strtab
-        // sprint("%x\n", cur.st_value);
-        fname = &str_ctl[cur.st_name];
+        fname = strtb + cur.st_name;
         break;
       }
     }
 
     cur_layer++;
-    if (fname != NULL)
-    {
-      sprint("%s\n", fname);
-      if (strcmp(fname, "main") == 0)
-        break;
-    }
-    else
-    {
-      sprint("function name don't exist!");
-      return 1;
-    }
-    // sprint("here\n");
-    // update the return address
+    sprint("%s\n", fname);
+    if (strcmp(fname, "main") == 0)
+      break;
     fp = (uint64 *)(*(fp - 2));
-    // sprint("here\n");
   }
 
   return 0;

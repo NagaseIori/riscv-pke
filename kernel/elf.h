@@ -6,11 +6,18 @@
 
 #define MAX_CMDLINE_ARGS 64
 
-// section header type
+// sh_type macros
+#define SHT_NULL 0
 #define SHT_SYMTAB 2
 #define SHT_STRTAB 3
-#define SHT_NULL 0
+
+// st_info macros
 #define STT_FUNC 2
+
+// other macros
+#define SHN_XINDEX 0xffff
+#define STRTB_CACHE 0xffff
+
 
 // elf header structure
 typedef struct elf_header_t {
@@ -91,5 +98,8 @@ elf_status elf_init(elf_ctx *ctx, void *info);
 elf_status elf_load(elf_ctx *ctx);
 
 void load_bincode_from_host_elf(process *p);
+
+extern elf_ctx cur_elf_ctx;
+uint64 elf_fpread(elf_ctx *ctx, void *dest, uint64 nb, uint64 offset);
 
 #endif

@@ -52,5 +52,5 @@ int exit(int code) {
 
 int print_backtrace(int layer_num)
 {
-  return do_user_call(SYS_user_printBacktrace, layer_num, 0, 0, 0, 0, 0, 0);
+  return do_user_call(SYS_user_print_backtrace, layer_num, 0, 0, 0, 0, 0, 0);
 }

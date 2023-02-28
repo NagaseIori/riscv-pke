@@ -1,6 +1,7 @@
 #include "kernel/riscv.h"
 #include "kernel/process.h"
 #include "spike_interface/spike_utils.h"
+#include "kernel/elf.h"
 
 static void handle_instruction_access_fault() { panic("Instruction access fault!"); }
 
@@ -29,6 +30,8 @@ static void handle_timer() {
 //
 void handle_mtrap() {
   uint64 mcause = read_csr(mcause);
+  uint64 mepc = read_csr(mepc);
+  elf_debug_catch(mepc);
   switch (mcause) {
     case CAUSE_MTIMER:
       handle_timer();

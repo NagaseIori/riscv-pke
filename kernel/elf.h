@@ -87,4 +87,12 @@ elf_status elf_load(elf_ctx *ctx);
 
 void load_bincode_from_host_elf(process *p);
 
+#define DEBUG_CACHE_SIZE (1<<18)
+#define CODE_CACHE_SIZE (1<<18)
+extern char elf_debug_line[DEBUG_CACHE_SIZE];
+extern int elf_debug_line_length;
+extern elf_ctx cur_elf_ctx;
+
+void elf_util_read_string(char *src, char *dst);
+void elf_debug_catch(uint64 epc);
 #endif

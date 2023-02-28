@@ -276,7 +276,7 @@ void make_addr_line(elf_ctx *ctx, char *debug_line, uint64 length)
         }
     endop:;
     }
-    sprint("APPEND DEBUG INFO TO PROCESS:%p\n", p);
+    // sprint("APPEND DEBUG INFO TO PROCESS:%p\n", p);
     // for (int i = 0; i < p->line_ind; i++)
     //     sprint("%p %d %d\n", p->line[i].addr, p->line[i].line, p->line[i].file);
 }
@@ -380,7 +380,7 @@ char * elf_util_read_file_line(char *file, int line) {
 
 void elf_debug_catch(uint64 epc) {
     process *p = current;
-    sprint("ANALYZE DEBUG INFO OF PROCESS:%p\n", p);
+    // sprint("ANALYZE DEBUG INFO OF PROCESS:%p\n", p);
     char dir[1024];
     for(int i=0; i<p->line_ind; i++) if(epc == p->line[i].addr) {
         dir[0] = 0;

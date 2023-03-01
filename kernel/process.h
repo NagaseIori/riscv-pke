@@ -2,6 +2,20 @@
 #define _PROC_H_
 
 #include "riscv.h"
+typedef struct vm_area_t vm_area;
+// Process virtual memory map
+typedef struct vm_area_t
+{
+  uint64 vm_start;
+  uint64 vm_end;
+  vm_area *next;
+} vm_area;
+
+typedef struct process_mmap_t
+{
+  vm_area *used, *free;
+} process_mmap;
+
 
 typedef struct trapframe_t {
   // space to store context (all common registers)
@@ -26,6 +40,7 @@ typedef struct process_t {
   pagetable_t pagetable;
   // trapframe storing the context of a (User mode) process.
   trapframe* trapframe;
+  process_mmap mmap;
 }process;
 
 // switch to run user app
@@ -36,5 +51,9 @@ extern process* current;
 
 // address of the first free page in our simple heap. added @lab2_2
 extern uint64 g_ufree_page;
+
+void mmap_init(process *p);
+uint64 mmap_map(process *p, int byte);
+void mmap_unmap(process *p, int va);
 
 #endif

@@ -184,6 +184,7 @@ void *user_va_to_pa(pagetable_t page_dir, void *va)
   // invalid PTE, and should return NULL.
   // panic( "You have to implement user_va_to_pa (convert user va to pa) to print messages in lab2_1.\n" );
   pte_t *pte = page_walk(page_dir, (uint64)(va), 0);
+  if(pte == NULL) return 0;
   uint64 pa = 0;
   pa += PTE2PA((*pte));
   pa += ((uint64)(va) & ((1<<PGSHIFT)-1));

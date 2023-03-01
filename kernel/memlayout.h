@@ -17,4 +17,7 @@
 // start virtual address (4MB) of our simple heap. added @lab2_2
 #define USER_FREE_ADDRESS_START 0x00000000 + PGSIZE * 1024
 
+// process' heap max size (32MB)
+#define PROCESS_HEAP_SIZE 32 * 1024 * 1024
+
 #endif

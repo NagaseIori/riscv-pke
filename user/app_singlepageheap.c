@@ -34,6 +34,9 @@ int main(void) {
     printu("your malloc is not complete.\n");
     exit(-1);
   }
+
+  better_free((void*)n);
+  better_free((void*)p);
 //  else{
 //    printu("0x%lx 0x%lx\n", m, n);
 //  }

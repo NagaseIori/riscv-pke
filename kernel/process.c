@@ -96,7 +96,7 @@ static void vm_area_union(pagetable_t pt, vm_area **head, uint64 begin, uint64 e
 {
   vm_area *p = *head;
   while(p) {
-    if(p->vm_end == begin || p->vm_start == end) {
+    if(!(p->vm_end < begin || p->vm_start > end)) {
       p->vm_start = begin<p->vm_start?begin:p->vm_start;
       p->vm_end = end>p->vm_end?end:p->vm_end;
       return;
@@ -108,6 +108,7 @@ static void vm_area_union(pagetable_t pt, vm_area **head, uint64 begin, uint64 e
   *head = nvm;
   nvm->vm_start = begin;
   nvm->vm_end = end;
+  // sprint("UNION CREATE. 0x%lx -> 0x%lx\n", nvm, nvm->next);
   return;
 }
 

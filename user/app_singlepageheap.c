@@ -14,6 +14,18 @@ char* strcpy(char* dest, const char* src) {
     ;
   return dest;
 }
+int fib(int n) {
+  if(n==1) return 1;
+  if(n==2) return 1;
+  int res = fib(n-1)+fib(n-2);
+  char *x = better_malloc(res+10);
+  strcpy(x, "hello.\n");
+  printu(x);
+  // better_free(x);
+  printu("%d 0x%lx\n", res, x);
+  return res;
+}
+
 int main(void) {
   
   char str[20] = "hello, world!!!";
@@ -37,6 +49,8 @@ int main(void) {
 
   better_free((void*)n);
   better_free((void*)p);
+
+  fib(8);
 //  else{
 //    printu("0x%lx 0x%lx\n", m, n);
 //  }

@@ -167,3 +167,8 @@ int unlink_u(const char *fn){
 int close(int fd) {
   return do_user_call(SYS_user_close, fd, 0, 0, 0, 0, 0, 0);
 }
+
+int exec(const char *fn) {
+  printu("Waiting implement.");
+  return -1;
+}

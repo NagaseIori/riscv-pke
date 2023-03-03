@@ -516,6 +516,7 @@ int vfs_closedir(struct file *file) {
 struct dentry *lookup_final_dentry(const char *path, struct dentry **parent,
                                    char *miss_name) {
   // Relative path workaround
+  // added @lab4_challenge1
   if(*path == '.') {
     path ++;
     *parent = vfs_cwd_dentry;
@@ -742,6 +743,8 @@ static void _strcat(char *dst, char *src) {
   while((*(dst ++) = *(src ++)) != 0);
 }
 
+// get full path of given dentry
+// added @lab4_challenge1
 void get_dentry_path(struct dentry *parent, char *path) {
   if(parent == vfs_root_dentry) {
     strcpy(path, "/");
@@ -760,17 +763,21 @@ void get_dentry_path(struct dentry *parent, char *path) {
   }
 }
 
+// get current working directory's path string
+// added @lab4_challenge1
 char *get_cwd_path() {
   return vfs_cwd_path;
 }
 
+// set current working directory's path via given string
+// added @lab4_challenge1
 int set_cwd(const char *path) {
   char miss_name[MAX_DENTRY_NAME_LEN];
   struct dentry * new_cwd_dentry = vfs_root_dentry;
   new_cwd_dentry = lookup_final_dentry(path, &new_cwd_dentry, miss_name);
   if(new_cwd_dentry == NULL)
     panic("directory missing:%s\n", miss_name);
-  vfs_cwd_dentry = new_cwd_dentry;
+  vfs_cwd_dentry = new_cwd_dentry;                  // set the new entry
   get_dentry_path(vfs_cwd_dentry, vfs_cwd_path);
   // sprint("New path:%s\n", vfs_cwd_path);
   return 0;

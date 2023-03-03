@@ -207,5 +207,8 @@ struct vinode *default_alloc_vinode(struct super_block *sb);
 struct dentry *lookup_final_dentry(const char *path, struct dentry **parent,
                                    char *miss_name);
 void get_base_name(const char *path, char *base_name);
+void get_dentry_path(struct dentry *parent, char *path);
+char* get_cwd_path();
+int set_cwd(const char *path);
 
 #endif

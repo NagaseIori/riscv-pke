@@ -16,6 +16,9 @@ struct device *vfs_dev_list[MAX_VFS_DEV];     // system device list in vfs layer
 struct hash_table dentry_hash_table;
 struct hash_table vinode_hash_table;
 
+char vfs_cwd_path[MAX_PATH_LEN];
+struct dentry *vfs_cwd_dentry;
+
 //
 // initializes the dentry hash list and vinode hash list
 //
@@ -98,6 +101,9 @@ struct super_block *vfs_mount(const char *dev_name, int mnt_type) {
   } else {
     panic("vfs_mount: unknown mount type!\n");
   }
+
+  vfs_cwd_dentry = vfs_root_dentry;
+  memcpy(vfs_cwd_path, "/", 2);
 
   return sb;
 }
@@ -509,6 +515,15 @@ int vfs_closedir(struct file *file) {
 //
 struct dentry *lookup_final_dentry(const char *path, struct dentry **parent,
                                    char *miss_name) {
+  // Relative path workaround
+  if(*path == '.') {
+    path ++;
+    *parent = vfs_cwd_dentry;
+    if(*path == '.') {
+      *parent = vfs_cwd_dentry->parent;
+      path ++;
+    }
+  }
   char path_copy[MAX_PATH_LEN];
   strcpy(path_copy, path);
 
@@ -721,3 +736,42 @@ struct vinode *default_alloc_vinode(struct super_block *sb) {
 }
 
 struct file_system_type *fs_list[MAX_SUPPORTED_FS];
+
+static void _strcat(char *dst, char *src) {
+  while(*dst) dst++;
+  while((*(dst ++) = *(src ++)) != 0);
+}
+
+void get_dentry_path(struct dentry *parent, char *path) {
+  if(parent == vfs_root_dentry) {
+    strcpy(path, "/");
+    return;
+  }
+  struct dentry *stack[MAX_PATH_LEN], **stack_p;
+  stack_p = stack;
+  while(parent != vfs_root_dentry) {
+    *(stack_p ++) = parent;
+    parent = parent->parent;
+  }
+  while(stack_p != stack) {
+    strcpy(path, "/");
+    stack_p --;
+    _strcat(path, (*stack_p)->name);
+  }
+}
+
+char *get_cwd_path() {
+  return vfs_cwd_path;
+}
+
+int set_cwd(const char *path) {
+  char miss_name[MAX_DENTRY_NAME_LEN];
+  struct dentry * new_cwd_dentry = vfs_root_dentry;
+  new_cwd_dentry = lookup_final_dentry(path, &new_cwd_dentry, miss_name);
+  if(new_cwd_dentry == NULL)
+    panic("directory missing:%s\n", miss_name);
+  vfs_cwd_dentry = new_cwd_dentry;
+  get_dentry_path(vfs_cwd_dentry, vfs_cwd_path);
+  // sprint("New path:%s\n", vfs_cwd_path);
+  return 0;
+}

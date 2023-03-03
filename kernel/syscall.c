@@ -201,6 +201,9 @@ ssize_t sys_user_unlink(char * vfn){
   return do_unlink(pfn);
 }
 
+//
+// lib call to execute a given app via vfs
+//
 ssize_t sys_user_exec(char *vfn)
 {
   char *pfn = (char *)user_va_to_pa((pagetable_t)(current->pagetable), (void *)vfn);

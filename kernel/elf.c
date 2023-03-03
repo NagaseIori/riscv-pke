@@ -35,7 +35,8 @@ static void *elf_alloc_mb(elf_ctx *ctx, uint64 elf_pa, uint64 elf_va, uint64 siz
 }
 
 //
-// actual file reading, using the spike file interface.
+// actual file reading, using the vfs.
+// modified in @lab4_challenge2
 //
 static uint64 elf_fpread(elf_ctx *ctx, void *dest, uint64 nb, uint64 offset) {
   elf_info *msg = (elf_info *)ctx->info;
@@ -109,6 +110,7 @@ elf_status elf_load(elf_ctx *ctx) {
 
 //
 // load the elf of user application, by using the spike file interface.
+// modified in @lab4_challenge2
 //
 void load_bincode_from_host_elf(process *p, const char *pfn) {
   sprint("Application: %s\n", pfn);

@@ -64,6 +64,7 @@ void enable_paging() {
 //
 // load the elf, and construct a "process" (with only a trapframe).
 // load_bincode_from_host_elf is defined in elf.c
+// modified in @lab4_challenge2
 //
 process* load_user_program(uint8_t load_from_argv, const char *pfn) {
   process* proc;
@@ -79,6 +80,7 @@ process* load_user_program(uint8_t load_from_argv, const char *pfn) {
     if (!argc)
       panic("You need to specify the application program!\n");
 
+    // simple hack to convert spike file path to vfs path
     if (arg_bug_msg.argv[0][0] == '.')
       strcpy(arg_bug_msg.argv[0], "/bin/app_exec");
 

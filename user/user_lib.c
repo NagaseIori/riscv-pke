@@ -169,6 +169,6 @@ int close(int fd) {
 }
 
 int exec(const char *fn) {
-  printu("Waiting implement.");
+  return do_user_call(SYS_user_exec, (uint64)fn, 0, 0, 0, 0, 0, 0);
   return -1;
 }
